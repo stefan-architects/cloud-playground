@@ -27,6 +27,8 @@ A loosely drawn map of where I’m heading — from re‑certifying as an AWS Cl
 - **Exploring:** Experimenting with AI‑focused cloud skills and practical ML workflows that support cloud architecture.  
 - **Direction:** A blended path toward cloud architecture, automation, DevOps maturity, and applied AI.
 
+This Playground reflects my progression toward a junior cloud and DevOps role, and I’m open to connecting with others in the field or exploring opportunities that support continued growth.
+
 ## 🧠 Philosophy & Rules  
 
 Everything lives in one mono‑repo because the story matters as much as the outcomes. Experiments, insights, dead ends, and plot twists stay visible. The structure doesn’t restrict creativity — it gives the chaos a narrative.
