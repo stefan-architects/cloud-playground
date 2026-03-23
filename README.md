@@ -2,9 +2,7 @@
 A mono‑repo for exploring AWS and DevOps through hands‑on experimentation.
 
 ## 🧩 What This Is (and Isn’t)  
-*Setting expectations without boxing myself in.*
-
-A repo built for practical exploration — open enough for ideas to get messy, structured just enough to turn experimentation into real cloud intuition. It’s learning by doing, not walking through templates, tutorials, or guided lessons.
+This repo is built for practical exploration, without boxing myself in — structured where it counts and open where ideas can get messy.
 
 **What It’s Not:**  
 - A polished portfolio crafted for presentation rather than progression  
@@ -18,13 +16,13 @@ A repo built for practical exploration — open enough for ideas to get messy, s
 **Everything in the Playground follows a simple rhythm: follow curiosity → build → break → panic → understand → document → repeat.** 
 
 ## 🗺️ Cloud Playground Roadmap  
-A loosely drawn map of where I’m heading — from re‑certifying as an AWS Cloud Practitioner to advancing towards Solutions Architect‑Associate, leveling up DevOps skills, and exploring AI services and certification.
+A rough outline of where I’m heading — after re‑certifying the AWS Cloud Practitioner certification
 
 → https://github.com/stefan-architects/cloud-playground/projects
 
 - **Now:** Rebuilding AWS fundamentals, sharpening hands‑on intuition, and reinforcing core DevOps practices.  
-- **Next:** Moving toward Solutions Architect‑Associate and strengthening real‑world architectural thinking.  
-- **Exploring:** Experimenting with AI‑focused cloud skills and practical ML workflows that support cloud architecture.  
+- **Next:** AWS Solutions Architect‑Associate (recertification).
+- **Exploring:** AWS Certified AI Practitioner certification.
 - **Direction:** A blended path toward cloud architecture, automation, DevOps maturity, and applied AI.
 
 This Playground reflects my progression toward a junior cloud and DevOps role, and I’m open to connecting with others in the field or exploring opportunities that support continued growth.
@@ -36,14 +34,10 @@ Everything lives in one mono‑repo because the story matters as much as the out
 Behind the scenes are half‑finished ideas, messy prototypes, and “I’ll clean this up later” experiments. Most learning happens off‑camera — notes, tests, break‑fix loops, and quiet iterations that eventually surface here.
 
 **Lightly enforced rules that keep the Playground functional:**  
-- Stay curious  
+- Stay curious — it keeps me learning, adapting, and moving toward what’s ahead
 - Keep experiments small (until they aren’t)  
-- Document what matters  
-- Respect the Map  
-- Ignore the Map when inspiration demands  
-- No guilt about abandoned ideas  
+- Document what matters, not everything, because I’m still learning what actually matters 
+- Respect the map, but don't hesitate to it ignore when the chaos has better ideas
+- No guilt about abandoned ideas
 
-## 🛡️ Content Disclaimer
-*To close things out, here’s a quick note on the source material and intent behind this repo.*
-
-Everything here reflects my own understanding, experiments, and occasional cloud confusion. No proprietary or paid course material is included — just my own words and hands‑on practice.
+## Thanks for Stopping By 
