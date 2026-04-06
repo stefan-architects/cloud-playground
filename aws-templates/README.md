@@ -18,13 +18,13 @@ And because nothing teaches faster than breaking things in the cloud, here are t
 
 Current files include:  
 - **ChaosVPC.yaml** – A VPC stack that’s actively being shaped, reshaped, and pushed toward something chaotic or awesome  
-- **create-key-pair-cli.sh** – A script that spins up fresh EC2 SSH key pairs while nudging you toward SSM so you can eventually ditch keys altogether  
-- **create-user-and-group.sh** – A growing IAM setup script that keeps evolving as you add users, groups, and the policies they swear they need  
-- **dynamo-cli.sh** – A DynamoDB table builder that I have absolutely no practical use for, but fun to build
-- **ec2-cli.sh** – An EC2 provisioning script that keeps expanding as you test instance types, AMIs, and whatever chaos you throw at it next  
-- **rds-cli.sh** – A steadily improving RDS setup script that handles the long, suspenseful wait for your database to finally become “available”  
-- **s3-cli.sh** – An S3 bucket creator that evolves as you experiment with versioning, encryption, lifecycle rules, and all the ways S3 can surprise you  
-- **security-groups-cli.sh** – A hands‑on security group builder that grows with your networking needs and occasionally reminds you what it feels like to lock yourself out  
+- **create-key-pair-cli.md** – A script that spins up fresh EC2 SSH key pairs while nudging you toward SSM so you can eventually ditch keys altogether  
+- **create-user-and-group.md** – A growing IAM setup script that keeps evolving as you add users, groups, and the policies they swear they need  
+- **dynamo-cli.md** – A DynamoDB table builder that I have absolutely no practical use for, but fun to build
+- **ec2-cli.md** – An EC2 provisioning script that keeps expanding as you test instance types, AMIs, and whatever chaos you throw at it next  
+- **rds-cli.md** – A steadily improving RDS setup script that handles the long, suspenseful wait for your database to finally become “available”  
+- **s3-cli.md** – An S3 bucket creator that evolves as you experiment with versioning, encryption, lifecycle rules, and all the ways S3 can surprise you  
+- **security-groups-cli.md** – A hands‑on security group builder that grows with your networking needs and occasionally reminds you what it feels like to lock yourself out  
 
 ## ⭐ AWS Patterns Demonstrated
 
