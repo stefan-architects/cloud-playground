@@ -11,7 +11,7 @@ Replace the placeholder values with your own values
 | `<OUTPUT_FORMAT>`    | Optional output format (default: `table`)                       |
 | `<COLOR_MODE>`       | Optional color mode (default: `on`)                             |
 
-## 🔧 Launch an EC2 Instance
+### 🧰 Launch an EC2 Instance
 ```bash
 aws ec2 run-instances \
   --image-id <AMI_ID> \
@@ -23,14 +23,16 @@ aws ec2 run-instances \
   --color <COLOR_MODE>
 ```
 
-## ❌ Terminate the EC2 Instance
+----
 
-### Find the Instance ID
+## 🗑️ Terminate the EC2 Instance
+
+### 💥 Find the Instance ID
 ```bash
 aws ec2 describe-instances
 ```
 
-### Terminate the Instance with the Instance ID 
+### 💥 Terminate the Instance with the Instance ID 
 ```bash 
 aws ec2 terminate-instances \
   --instance-ids <INSTANCE_ID>

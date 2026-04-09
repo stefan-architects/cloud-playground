@@ -6,21 +6,21 @@ Replace the placeholder values with your own values
 | `<IAM_USER_NAME>` | The name of the IAM user you want to create or reference |
 | `<IAM_GROUP_NAME>` | The name of the IAM group you want to create or reference |
 
-## 🔧 Creating User & Group
+## 🏗️ Creating User & Group
 
-### ✅ Create IAM User
+### 🧰 Create IAM User
 ```bash
 aws iam create-user \
   --user-name <IAM_USER_NAME>
 ```
 
-### ✅ Create IAM Group
+### 🧰 Create IAM Group
 ```bash
 aws iam create-group \
   --group-name <IAM_GROUP_NAME>
 ```
 
-### ✅ Add the User to the Group
+### 🧰 Add the User to the Group
 ```bash
 aws iam add-user-to-group \
   --user-name <IAM_USER_NAME> \
@@ -28,15 +28,23 @@ aws iam add-user-to-group \
 
 ```
 
-## 🗑️ Delete User & Group
+----
 
-### ❌  Delete the IAM User
+## 🗑️ Delete User & Group
+### 💥 Delete the IAM User from Group
+```bash
+aws iam remove-user-from-group \
+  --user-name <IAM_USER_NAME> \
+  --group-name <IAM_GROUP_NAME>
+```
+
+### 💥 Delete the IAM User
 ```bash
 aws iam delete-user \
   --user-name <IAM_USER_NAME>
 ```
 
-### ❌ Delete the IAM Group
+### 💥 Delete the IAM Group
 ```bash
 aws iam delete-group \
   --group-name <IAM_GROUP_NAME>

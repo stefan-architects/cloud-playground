@@ -15,29 +15,40 @@
 ## 🏗️ Bucket Configuration
 
 ### 🧰 Create the bucket
+```bash
 aws s3api create-bucket \
   --bucket <BUCKET_NAME> \
   --region <REGION>
+```
 
 ### 🧰 Enable versioning
+```bash
 aws s3api put-bucket-versioning \
   --bucket <BUCKET_NAME> \
   --versioning-configuration Status=Enabled
+```
 
 ### 🧰 Block all public access
+```bash
 aws s3api put-public-access-block \
   --bucket <BUCKET_NAME> \
   --public-access-block-configuration \
       BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+```
 
 ### 🧰 Enable default encryption (SSE-S3)
+```bash
 aws s3api put-bucket-encryption \
   --bucket <BUCKET_NAME> \
   --server-side-encryption-configuration \
       '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+```
 
-## 🗑️ Bucket Deletion 
+----
 
-### 💥 Revoke Ingress
-### 💥 Revoke Ingress
-### 💥 Revoke Ingress
+### 💥 Bucket Deletion
+```bash
+aws s3api delete-bucket \
+  --bucket <BUCKET_NAME> \
+  --region <REGION>
+```

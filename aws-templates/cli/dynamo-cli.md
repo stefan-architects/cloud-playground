@@ -9,7 +9,7 @@ Replace the placeholder values with your own values
 | `<READ_CAPACITY>` | Provisioned read capacity units (for provisioned mode) |
 | `<WRITE_CAPACITY>` | Provisioned write capacity units (for provisioned mode) |
 
-## 🔧 Create DynamoDB Table
+### 🧰 Create DynamoDB Table
 ```bash
 aws dynamodb create-table \
   --table-name <DDB_TABLE_NAME> \
@@ -18,7 +18,9 @@ aws dynamodb create-table \
   --provisioned-throughput ReadCapacityUnits=<READ_CAPACITY>,WriteCapacityUnits=<WRITE_CAPACITY>
 ```
 
-## 🗑️ Delete DynamoDB Table
+----
+
+### 💥 Delete DynamoDB Table
 ```bash
 aws dynamodb delete-table \
   --table-name <DDB_TABLE_NAME>
