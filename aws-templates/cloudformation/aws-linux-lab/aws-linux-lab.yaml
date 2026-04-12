@@ -1,0 +1,131 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Linux for AWS Study Lab - EC2 + S3 + IAM
+
+Parameters:
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Existing EC2 KeyPair for SSH access
+
+  SSHLocation:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: CIDR allowed to SSH (restrict this in real use)
+
+  LatestAL2023Ami:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+Resources:
+
+  StudyBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+      Path: /
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref InstanceRole
+      Path: /
+
+  StudySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH for study lab
+      VpcId: !Ref AWS::NoValue
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHLocation
+
+  StudyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      IamInstanceProfile: !Ref InstanceProfile
+      KeyName: !Ref KeyPairName
+      SecurityGroupIds:
+        - !Ref StudySecurityGroup
+      ImageId: !Ref LatestAL2023Ami
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+
+          # Basic tools
+          yum install -y git htop tree unzip zip
+
+          # Install AWS CLI v2 if missing
+          if ! command -v aws &> /dev/null
+          then
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install
+          fi
+
+          # Create study directory
+          mkdir -p /home/ec2-user/study
+          chown ec2-user:ec2-user /home/ec2-user/study
+
+          # Sample log file
+          echo "Linux for AWS Study Log" > /home/ec2-user/study/app.log
+          echo "Line 1 - test log entry" >> /home/ec2-user/study/app.log
+          echo "Line 2 - another entry" >> /home/ec2-user/study/app.log
+
+          # Backup script
+          cat << 'EOF' > /home/ec2-user/study/backup_to_s3.sh
+          #!/bin/bash
+          BUCKET_NAME=${StudyBucket}
+          LOG_DIR=/home/ec2-user/study
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          ARCHIVE=/tmp/study-logs-$TIMESTAMP.tar.gz
+
+          tar -czf $ARCHIVE -C $LOG_DIR app.log
+          aws s3 cp $ARCHIVE s3://$BUCKET_NAME/logs/
+          EOF
+
+          chmod +x /home/ec2-user/study/backup_to_s3.sh
+          chown ec2-user:ec2-user /home/ec2-user/study/backup_to_s3.sh
+
+          # Cron job (hourly)
+          crontab -u ec2-user -l 2>/dev/null > /tmp/cron_ec2user || true
+          echo "0 * * * * /home/ec2-user/study/backup_to_s3.sh >> /home/ec2-user/study/cron.log 2>&1" >> /tmp/cron_ec2user
+          crontab -u ec2-user /tmp/cron_ec2user
+
+          # MOTD
+          echo "Welcome to your Linux for AWS study instance." > /etc/motd
+          echo "Study dir: /home/ec2-user/study" >> /etc/motd
+          echo "Try: ls, cd, cat, tail, chmod, chown, ps, top, df, du, systemctl, journalctl, aws s3 ls" >> /etc/motd
+
+Outputs:
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref StudyInstance
+
+  PublicIP:
+    Description: Public IP of the study instance
+    Value: !GetAtt StudyInstance.PublicIp
+
+  StudyBucketName:
+    Description: S3 bucket for log backups
+    Value: !Ref StudyBucket
