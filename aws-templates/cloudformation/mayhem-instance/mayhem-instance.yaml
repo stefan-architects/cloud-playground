@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Chaotic EC2 Mayhem Machine — An EC2 instance that generates random personalities,
+  moods, colors, quotes, and chaos on every boot. For fun, demos, and learning.
+
+Parameters:
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access.
+
+Resources:
+
+  ChaosSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and SSH for the Chaos Machine
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: ChaosMachineSG
+
+  ChaosInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref KeyPairName
+      SecurityGroupIds:
+        - !Ref ChaosSecurityGroup
+      ImageId: ami-0c02fb55956c7d316  # Amazon Linux 2 for us-east-1
+      Tags:
+        - Key: Name
+          Value: ChaosMachine
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd jq cowsay
+          systemctl enable httpd
+          systemctl start httpd
+
+          # Random arrays
+          PERSONALITIES=("Chaotic Neutral Goblin" "Unhinged Pirate Server" "Over-Caffeinated AI" "Existential Goldfish" "Time-Traveling Accountant")
+          MOODS=("spicy" "unpredictable" "slightly confused" "hyperactive" "mysterious")
+          EMOJIS=("🔥" "🌀" "🤖" "🐙" "⚡" "🦄" "💥")
+
+          # Pick random values
+          PERSONALITY=${PERSONALITIES[$RANDOM % ${#PERSONALITIES[@]}]}
+          MOOD=${MOODS[$RANDOM % ${#MOODS[@]}]}
+          EMOJI=${EMOJIS[$RANDOM % ${#EMOJIS[@]}]}
+
+          # Random background color
+          COLOR=$(printf "#%06X" $((RANDOM*RANDOM)))
+
+          # Random quote
+          QUOTE=$(curl -s https://api.quotable.io/random | jq -r '.content')
+
+          # Create chaotic webpage
+          cat <<EOF > /var/www/html/index.html
+          <html>
+          <body style="background-color:${COLOR}; font-family:Arial; color:white; text-align:center; padding-top:50px;">
+          <h1>${EMOJI} Welcome to the Chaos Machine ${EMOJI}</h1>
+          <h2>Personality: ${PERSONALITY}</h2>
+          <h3>Current Mood: ${MOOD}</h3>
+          <p><i>"${QUOTE}"</i></p>
+          </body>
+          </html>
+          EOF
+
+          # Log chaos
+          echo "[$(date)] Chaos Machine booted with personality: $PERSONALITY" >> /var/log/chaos.log
+          cowsay "Chaos level: $((RANDOM % 100))%" >> /var/log/chaos.log
+
+Outputs:
+  PublicIP:
+    Description: Public IP of the Chaos Machine
+    Value: !GetAtt ChaosInstance.PublicIp
+
+  ChaosURL:
+    Description: URL to view the chaotic webpage
+    Value: !Sub "http://${ChaosInstance.PublicDnsName}"
