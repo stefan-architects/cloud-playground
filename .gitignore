@@ -2,5 +2,5 @@
 todo.md
 
 # ignore folder
-aws-templates\cloudformation\aws-linux-lab\docs
-admin\
+aws-templates/cloudformation/aws-linux-lab/docs/
+admin/
