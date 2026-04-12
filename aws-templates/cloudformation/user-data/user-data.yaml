@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Chaotic EC2 Mayhem Machine — An EC2 instance that generates random personalities,
+  moods, colors, quotes, and chaos on every boot. For fun, demos, and learning.
+
+Parameters:
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access.
+
+Resources:
+
+  ChaosSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and SSH for the Chaos Machine
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: ChaosMachineSG
+
+  ChaosInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref KeyPairName
+      SecurityGroupIds:
+        - !Ref ChaosSecurityGroup
+      ImageId: ami-0c02fb55956c7d316
+      Tags:
+        - Key: Name
+          Value: ChaosMachine
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd curl
+
+          systemctl enable httpd
+          systemctl start httpd
+
+          # Create a simple webpage with EC2 metadata
+          echo "<html><body style='font-family: Arial; padding: 20px;'>" > /var/www/html/index.html
+          echo "<h1>EC2 Instance Metadata</h1>" >> /var/www/html/index.html
+
+          echo "<p><b>Instance ID:</b> $(curl -s http://169.254.169.254/latest/meta-data/instance-id)</p>" >> /var/www/html/index.html
+          echo "<p><b>Instance Type:</b> $(curl -s http://169.254.169.254/latest/meta-data/instance-type)</p>" >> /var/www/html/index.html
+          echo "<p><b>Local IP:</b> $(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)</p>" >> /var/www/html/index.html
+          echo "<p><b>Public IP:</b> $(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)</p>" >> /var/www/html/index.html
+          echo "<p><b>Hostname:</b> $(curl -s http://169.254.169.254/latest/meta-data/hostname)</p>" >> /var/www/html/index.html
+          echo "<p><b>Availability Zone:</b> $(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)</p>" >> /var/www/html/index.html
+          echo "<p><b>Region:</b> $(curl -s http://169.254.169.254/latest/meta-data/placement/region)</p>" >> /var/www/html/index.html
+
+          echo "<hr><p>Generated automatically at boot.</p>" >> /var/www/html/index.html
+          echo "</body></html>" >> /var/www/html/index.html
+
+Outputs:
+  PublicIP:
+    Description: Public IP of the Chaos Machine
+    Value: !GetAtt ChaosInstance.PublicIp
+
+  ChaosURL:
+    Description: URL to view the chaotic webpage
+    Value: !Sub "http://${ChaosInstance.PublicDnsName}"
