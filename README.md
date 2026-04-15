@@ -27,6 +27,16 @@ A rough outline of where I’m heading — after re‑certifying the AWS Cloud P
 
 This Playground reflects my progression toward a junior cloud and DevOps role, and I’m open to connecting with others in the field or exploring opportunities that support continued growth.
 
+## 📘 Learning Resources Used
+
+| **Resource Type**       | **Description**                                   | **Best For** |
+|-------------------------|---------------------------------------------------|--------------|
+| **Digital Training**    | Self‑paced online courses and video modules       | When your brain wants knowledge *now* but also wants to stay in pajamas |
+| **Classroom Training**  | Instructor‑led sessions, workshops, or seminars   | Those days when you need a human to keep you from wandering into 47 tabs |
+| **Practice Exams**      | Sample questions, quizzes, and scenario tests     | Finding out what you *thought* you knew but absolutely did not |
+| **Documentation**       | Official guides, manuals, articles, whitepapers   | Summoning your inner detective to decode cryptic wisdom from the ancients |
+| **Hands‑on Labs**       | Practical exercises, simulations, real‑world tasks | Breaking things safely so you can learn how to un‑break them |
+
 ## 🧠 Philosophy & Rules  
 
 Everything lives in one mono‑repo because the story matters as much as the outcomes. Experiments, insights, dead ends, and plot twists stay visible. The structure doesn’t restrict creativity — it gives the chaos a narrative.
@@ -40,4 +50,4 @@ Behind the scenes are half‑finished ideas, messy prototypes, and “I’ll cle
 - Respect the map, but don't hesitate to it ignore when the chaos has better ideas
 - No guilt about abandoned ideas
 
-## Thanks for Stopping By 
+## 👋 Thanks for stopping by — appreciate you taking the time to explore this space.
