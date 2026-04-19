@@ -2,6 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Creates a single S3 bucket and ec2 instance to test a one-click deployment via Cloudformation.
 
 Resources:
+  # Logical ID using for bucket
   thebucketsbucket:
     Type: 'AWS::S3::Bucket'
     Properties:
@@ -9,6 +10,7 @@ Resources:
       # BucketName:       
         ## can use pseudo parameter: BucketName: !Sub "amzn-s3-demo-bucket-${AWS::AccountId}-${AWS::Region}-an"
         ### can't use bucket name and bucket prefix at same time
+      # Physcial ID for bucket
       BucketNamePrefix: chaos
       # added "account-regional"
       BucketNamespace: "account-regional"
