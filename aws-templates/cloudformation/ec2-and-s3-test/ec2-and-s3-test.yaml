@@ -2,12 +2,16 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Creates a single S3 bucket and ec2 instance to test a one-click deployment via Cloudformation.
 
 Resources:
-  TheBucketsBucket:
+  thebucketsbucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: TheBucketsBucket
-      # BucketNamePrefix: prod <--- unsure if needed
-      # BucketNamespace: us-east-1 <--- Failure reason Properties validation failed for resource TheBucketsBucket with message: [#/BucketNamespace: us-east-1 is not a valid enum value]
+    # https://docs.aws.amazon.com/AmazonS3/latest/userguide/gpbucketnamespaces.html
+      # BucketName:       
+        ## can use pseudo parameter: BucketName: !Sub "amzn-s3-demo-bucket-${AWS::AccountId}-${AWS::Region}-an"
+        ### can't use bucket name and bucket prefix at same time
+      BucketNamePrefix: chaos
+      # added "account-regional"
+      BucketNamespace: "account-regional"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
@@ -23,7 +27,7 @@ Resources:
 Outputs:
   BucketName:
     Description: Name of the S3 bucket created by this stack
-    Value: !Ref TheBucketsBucket
+    Value: !Ref thebucketsbucket
 
   InstanceName:
     Description: Name of the instance created by this stack
