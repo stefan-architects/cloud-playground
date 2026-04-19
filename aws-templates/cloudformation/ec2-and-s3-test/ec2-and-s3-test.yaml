@@ -5,9 +5,9 @@ Resources:
   TheBucketsBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      # BucketNamePrefix: prod
-      # BucketNamespace: us-east-1 <--- receiving error
-      # BucketName: MyBucket <--- receiving error
+      BucketName: TheBucketsBucket
+      # BucketNamePrefix: prod <--- unsure if needed
+      # BucketNamespace: us-east-1 <--- Failure reason Properties validation failed for resource TheBucketsBucket with message: [#/BucketNamespace: us-east-1 is not a valid enum value]
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
