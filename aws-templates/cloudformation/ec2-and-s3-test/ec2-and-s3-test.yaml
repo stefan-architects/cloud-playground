@@ -2,12 +2,12 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Creates a single S3 bucket and ec2 instance to test a one-click deployment via Cloudformation.
 
 Resources:
-  MyBucket:
+  TheBucketsBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketNamePrefix: prod
-      BucketNamespace: acme
-      BucketName: my-bucket
+      # BucketNamePrefix: prod
+      # BucketNamespace: us-east-1 <--- receiving error
+      # BucketName: MyBucket <--- receiving error
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
