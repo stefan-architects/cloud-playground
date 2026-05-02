@@ -1,6 +1,9 @@
 # Ignore a file
-todo.md
+
+
+
 
 # ignore folder
 aws-templates/cloudformation/aws-linux-lab/docs/
 admin/
+ai/
