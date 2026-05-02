@@ -1,2 +1,25 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: VPC to do stuff with
+Description: A VPC built so I can unleash whatever unholy AWS experiments I come up with next.
+
+Parameters:
+
+  # --- Environment ---
+
+  # --- Compute ---
+
+  # --- Networking ---
+
+Mappings:
+
+  # --- AMIs by Region ---
+
+  # --- CIDRs by Environment ---
+
+Resources:
+
+  # ---- Networking ----
+ 
+  # ---- Security Groups ----
+
+  # ---- Compute ----
+
