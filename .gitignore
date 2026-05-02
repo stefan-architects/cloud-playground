@@ -7,3 +7,11 @@
 aws-templates/cloudformation/aws-linux-lab/docs/
 admin/
 ai/
+aws-templates/cloudformation/chaos-vpc/chaos-vpc-test-template.yml
+aws-templates/cloudformation/chaos-vpc/Notes.md
+aws-templates/cloudformation/ec2-and-s3-test/account regional namespace.jpg
+aws-templates/cloudformation/ec2-and-s3-test/ec2-and-s3-test.yaml
+aws-templates/cloudformation/ec2-and-s3-test/ec2-and-s3-test.yaml
+.gitignore
+aws-templates/cloudformation/mayhem-instance/mayhem-instance.yaml
+aws-templates/cloudformation/user-data/user-data.yaml
