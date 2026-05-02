@@ -139,6 +139,19 @@ Resources:
           FromPort: 3389
           ToPort: 3389
 
+  ## NFS ----> NFS allows systems to share directories and files over a network, enabling clients to access remote files as if they were local. 
+  ### To be used for S3 Files
+    ChaosNFS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: NFS allows systems to share directories and files over a network, enabling clients to access remote files as if they were local. To be used for S3 Files 
+      VpcId: !Ref ChaosVpc
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+
   # ==== Compute ====
   ## EC2 instance in the public subnet
   ChaosLinuxInstance:
