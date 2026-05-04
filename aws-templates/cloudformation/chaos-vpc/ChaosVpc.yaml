@@ -1,25 +1,788 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: A VPC built so I can unleash whatever unholy AWS experiments I come up with next.
+
+Description: >
+  A VPC built so I can unleash whatever unholy AWS experiments.
+  Deployed Instances support SSM Session Manager by default, so no SSH/RDP is required.
+
+Mappings:
+  # --- AMIs by Region ---
+  RegionAMI:
+    us-east-1:
+      LinuxAMI: ami-0e449927258d45bc4
+      WindowsAMI: ami-0798c9ebaf695e14e
+      UbuntuAMI: ami-05cf1e9f73fbad2e2
+    us-east-2:
+      LinuxAMI: ami-060a84cbcb5c14844
+      WindowsAMI: ami-0943b9367678960d6
+      UbuntuAMI: ami-0eab37cfdc33e8e65
+    us-west-1:
+      LinuxAMI: ami-0a1a70369f0fce06a
+      WindowsAMI: ami-081096d1f72e5d650
+      UbuntuAMI: ami-0d227069c3229a8aa
+    us-west-2:
+      LinuxAMI: ami-0892d3c7ee96c0bf7
+      WindowsAMI: ami-0c0b8ad5284b618e9
+      UbuntuAMI: ami-06c6960215cdac78d
+
+  # --- CIDRs by Network ---
+  NetworkCidrs:
+    development:
+      Vpc: 10.10.0.0/16
+      PublicIngress1: 10.10.1.0/24
+      PublicIngress2: 10.10.2.0/24
+      PublicIngress3: 10.10.3.0/24
+      PrivateApp1: 10.10.11.0/24
+      PrivateApp2: 10.10.12.0/24
+      PrivateApp3: 10.10.13.0/24
+
+    production:
+      Vpc: 10.20.0.0/16
+      PublicIngress1: 10.20.1.0/24
+      PublicIngress2: 10.20.2.0/24
+      PublicIngress3: 10.20.3.0/24
+      PrivateApp1: 10.20.11.0/24
+      PrivateApp2: 10.20.12.0/24
+      PrivateApp3: 10.20.13.0/24
+
+    sandbox1:
+      Vpc: 192.168.10.0/16
+      PublicIngress1: 192.168.10.0/24
+      PublicIngress2: 192.168.11.0/24
+      PublicIngress3: 192.168.12.0/24
+      PrivateApp1: 192.168.20.0/24
+      PrivateApp2: 192.168.21.0/24
+      PrivateApp3: 192.168.22.0/24
+
+    sandbox2:
+      Vpc: 192.168.20.0/16
+      PublicIngress1: 192.168.20.0/24
+      PublicIngress2: 192.168.21.0/24
+      PublicIngress3: 192.168.22.0/24
+      PrivateApp1: 192.168.30.0/24
+      PrivateApp2: 192.168.31.0/24
+      PrivateApp3: 192.168.32.0/24
 
 Parameters:
 
-  # --- Environment ---
+  # --- Network Environment ---
+  Environment:
+    Type: String
+    Default: "development"
+    AllowedValues:
+      - development
+      - production
+      - sandbox1
+      - sandbox2
+    Description: Overrides the VPC CIDR block from the NetworkCidrs mapping. Leave empty to use the Environment default.
 
-  # --- Compute ---
+   # --- VPC CIDR Override ---
+  VpcCidr:
+    Type: String
+    Default: ""
+    Description: >-
+      Overrides the VPC CIDR block from the NetworkCidrs mapping. Leave empty to use the Environment default
+      (development: 10.10.0.0/16, production: 10.20.0.0/16, sandbox1: 192.168.10.0/16, sandbox2: 192.168.20.0/16).
+  
+  # --- Public Subnet CIDR Overrides ---
+  PublicSubnet1Cidr:
+    Type: String
+    Default: ""
+    Description: >-
+      Overrides the PublicIngress1 subnet CIDR from the NetworkCidrs mapping. Leave empty to use the Environment default
+      (development: 10.10.1.0/24, production: 10.20.1.0/24, sandbox1: 192.168.10.0/24, sandbox2: 192.168.20.0/24).
 
-  # --- Networking ---
+  PublicSubnet2Cidr:
+    Type: String
+    Default: ""
+    Description: >-
+      Overrides the PublicIngress2 subnet CIDR from the NetworkCidrs mapping. Leave empty to use the Environment default
+      (development: 10.10.2.0/24, production: 10.20.2.0/24, sandbox1: 192.168.11.0/24, sandbox2: 192.168.21.0/24).
 
-Mappings:
+  PublicSubnet3Cidr:
+    Type: String
+    Default: ""
+    Description: >-
+      Overrides the PublicIngress3 subnet CIDR from the NetworkCidrs mapping. Leave empty to use the Environment default
+      (development: 10.10.3.0/24, production: 10.20.3.0/24, sandbox1: 192.168.12.0/24, sandbox2: 192.168.22.0/24).
 
-  # --- AMIs by Region ---
+  # --- Private Subnet CIDR Overrides ---
+  PrivateSubnet1Cidr:
+    Type: String
+    Default: ""
+    Description: >-
+      Overrides the PrivateApp1 subnet CIDR from the NetworkCidrs mapping. Leave empty to use the Environment default
+      (development: 10.10.11.0/24, production: 10.20.11.0/24, sandbox1: 192.168.20.0/24, sandbox2: 192.168.30.0/24).
 
-  # --- CIDRs by Environment ---
+  PrivateSubnet2Cidr:
+    Type: String
+    Default: ""
+    Description: >-
+      Overrides the PrivateApp2 subnet CIDR from the NetworkCidrs mapping. Leave empty to use the Environment default
+      (development: 10.10.12.0/24, production: 10.20.12.0/24, sandbox1: 192.168.21.0/24, sandbox2: 192.168.31.0/24).
+
+  PrivateSubnet3Cidr:
+    Type: String
+    Default: ""
+    Description: >-
+      Overrides the PrivateApp3 subnet CIDR from the NetworkCidrs mapping. Leave empty to use the Environment default
+      (development: 10.10.13.0/24, production: 10.20.13.0/24, sandbox1: 192.168.22.0/24, sandbox2: 192.168.32.0/24).
+
+  # --- Compute Configuration ---
+  LinuxInstanceType:
+    Type: String
+    Default: "t2.micro"
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t3.micro
+      - t3.small
+    Description: EC2 instance type for Linux Auto Scaling Group.
+
+  LinuxInstanceCount:
+    Type: Number
+    Default: "1"
+    MinValue: 0
+    MaxValue: 10
+    Description: Number of Linux instances to launch.
+
+  WindowsInstanceType:
+    Type: String
+    Default: "t3.micro"
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t3.micro
+      - t3.small
+    Description: EC2 instance type for Windows Auto Scaling Group.
+
+  WindowsInstanceCount:
+    Type: Number
+    Default: "1"
+    MinValue: 0
+    MaxValue: 10
+    Description: Number of Windows instances to launch.
+
+  UbuntuInstanceType:
+    Type: String
+    Default: "t2.micro"
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t3.micro
+      - t3.small
+    Description: EC2 instance type for Ubuntu Auto Scaling Group.
+
+  UbuntuInstanceCount:
+    Type: Number
+    Default: "1"
+    MinValue: 0
+    MaxValue: 10
+    Description: Number of Ubuntu instances to launch.
+
+  # --- Network Access CIDRs ---
+  IcmpCidr:
+    Type: String
+    Default: "0.0.0.0/0"
+    Description: CIDR allowed to send ICMP (ping) traffic.
+
+  SshCidr:
+    Type: String
+    Default: "0.0.0.0/0"
+    Description: CIDR allowed SSH access on port 22.
+
+  HttpCidr:
+    Type: String
+    Default: "0.0.0.0/0"
+    Description: CIDR allowed HTTP access on port 80.
+
+  HttpsCidr:
+    Type: String
+    Default: "0.0.0.0/0"
+    Description: CIDR allowed HTTPS access on port 443.
+
+  RdpCidr:
+    Type: String
+    Default: "0.0.0.0/0"
+    Description: CIDR allowed RDP access on port 3389.
+
+  NfsCidr:
+    Type: String
+    Default: "0.0.0.0/0"
+    Description: CIDR allowed NFS access on port 2049.
+
+  # --- Linux Protocol Toggles ---
+  DeployLinux:
+    Type: String
+    AllowedValues: ["true", "false"]
+    Default: "true"
+    Description: Controls whether Linux resources are deployed.
+
+  EnableLinuxSSH:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables SSH security group for Linux instances.
+  
+  # EnableLinuxICMP: 💡Commented out to test at a later date to see if this can be added when instance is launched
+    # Type: String
+    # AllowedValues: ["true","false"]
+    # Default: "false"
+    # Description: Enables ICMP security group for Linux instances.
+
+  EnableLinuxHTTP:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables HTTP security group for Linux instances.
+
+  EnableLinuxHTTPS:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables HTTPS security group for Linux instances.
+
+  EnableLinuxNFS:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables NFS security group for Linux instances.
+
+  # --- Windows Protocol Toggles ---
+  DeployWindows:
+    Type: String
+    AllowedValues: ["true", "false"]
+    Default: "false"
+    Description: Controls whether Windows resources are deployed.
+
+  EnableWindowsSSH:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables SSH security group for Windows instances.
+    
+  EnableWindowsICMP:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables ICMP security group for Windows instances.
+
+  EnableWindowsHTTP:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables HTTP security group for Windows instances.
+
+  EnableWindowsHTTPS:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables HTTPS security group for Windows instances.
+
+  EnableWindowsRDP:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables RDP security group for Windows instances.
+
+  # --- Ubuntu Protocol Toggles ---
+  DeployUbuntu:
+    Type: String
+    AllowedValues: ["true", "false"]
+    Default: "false"
+    Description: Controls whether Ubuntu resources are deployed.
+
+  EnableUbuntuSSH:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables SSH security group for Ubuntu instances.
+  
+  EnableUbuntuICMP:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables ICMP security group for Ubuntu instances.
+
+  EnableUbuntuHTTP:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables HTTP security group for Ubuntu instances.
+
+  EnableUbuntuHTTPS:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables HTTPS security group for Ubuntu instances.
+
+  EnableUbuntuNFS:
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables NFS security group for Ubuntu instances.
+ 
+Conditions:
+
+  # --- CIDR Override Conditions. These determine whether custom CIDR parameters were supplied. ---
+  UseCustomVpcCidr: !Not [!Equals [!Ref VpcCidr, ""]]
+  UseCustomPub1:    !Not [!Equals [!Ref PublicSubnet1Cidr, ""]]
+  UseCustomPub2:    !Not [!Equals [!Ref PublicSubnet2Cidr, ""]]
+  UseCustomPub3:    !Not [!Equals [!Ref PublicSubnet3Cidr, ""]]
+  UseCustomPriv1:   !Not [!Equals [!Ref PrivateSubnet1Cidr, ""]]
+  UseCustomPriv2:   !Not [!Equals [!Ref PrivateSubnet2Cidr, ""]]
+  UseCustomPriv3:   !Not [!Equals [!Ref PrivateSubnet3Cidr, ""]]
+
+  # --- Linux Protocol Toggles. Enables or disables ICMP, SSH, HTTP, HTTPS, and NFS for Linux hosts. ---
+  LinuxICMPEnabled:  !Equals [!Ref EnableLinuxICMP, "true"]
+  LinuxSSHEnabled:   !Equals [!Ref EnableLinuxSSH, "true"]
+  LinuxHTTPEnabled:  !Equals [!Ref EnableLinuxHTTP, "true"]
+  LinuxHTTPSEnabled: !Equals [!Ref EnableLinuxHTTPS, "true"]
+  LinuxNFSEnabled:   !Equals [!Ref EnableLinuxNFS, "true"]
+
+  # --- Windows Protocol Toggles. Enables or disables ICMP, SSH, HTTP, HTTPS, and RDP for Windows hosts. ---
+  WindowsICMPEnabled:  !Equals [!Ref EnableWindowsICMP, "true"]
+  WindowsSSHEnabled:   !Equals [!Ref EnableWindowsSSH, "true"]
+  WindowsHTTPEnabled:  !Equals [!Ref EnableWindowsHTTP, "true"]
+  WindowsHTTPSEnabled: !Equals [!Ref EnableWindowsHTTPS, "true"]
+  WindowsRDPEnabled:   !Equals [!Ref EnableWindowsRDP, "true"]
+
+  # --- Ubuntu Protocol Toggles. Enables or disables ICMP, SSH, HTTP, HTTPS, and NFS for Ubuntu hosts. ---
+  UbuntuICMPEnabled:  !Equals [!Ref EnableUbuntuICMP, "true"]
+  UbuntuSSHEnabled:   !Equals [!Ref EnableUbuntuSSH, "true"]
+  UbuntuHTTPEnabled:  !Equals [!Ref EnableUbuntuHTTP, "true"]
+  UbuntuHTTPSEnabled: !Equals [!Ref EnableUbuntuHTTPS, "true"]
+  UbuntuNFSEnabled:   !Equals [!Ref EnableUbuntuNFS, "true"]
+
+  # --- Linux, Windows, and Ubuntu Deployment Toggles. Controls whether Linux, Windows, and/or Ubuntu resources are created. ---
+  DeployLinuxEnabled:   !Equals [!Ref DeployLinux, "true"]
+  DeployWindowsEnabled: !Equals [!Ref DeployWindows, "true"]
+  DeployUbuntuEnabled:  !Equals [!Ref DeployUbuntu, "true"]
 
 Resources:
 
-  # ---- Networking ----
- 
-  # ---- Security Groups ----
+  # --- Networking ---
+  ChaosVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !If
+        - UseCustomVpcCidr
+        - !Ref VpcCidr
+        - !FindInMap [NetworkCidrs, !Ref Environment, Vpc]
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
 
-  # ---- Compute ----
+  # --- Internet Gateway ---
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
 
+  VpcGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref ChaosVpc
+      InternetGatewayId: !Ref InternetGateway
+  
+  # --- Public Routing ---
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ChaosVpc
+
+  # --- Public and Private Route Tables ---
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VpcGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ChaosVpc
+
+  # --- Public Ingress Subnets ---
+  PublicIngress1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ChaosVpc
+      MapPublicIpOnLaunch: true
+      CidrBlock: !If
+        - UseCustomPub1
+        - !Ref PublicSubnet1Cidr
+        - !FindInMap [NetworkCidrs, !Ref Environment, PublicIngress1]
+
+  PublicIngress2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ChaosVpc
+      MapPublicIpOnLaunch: true
+      CidrBlock: !If
+        - UseCustomPub2
+        - !Ref PublicSubnet2Cidr
+        - !FindInMap [NetworkCidrs, !Ref Environment, PublicIngress2]
+
+  PublicIngress3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ChaosVpc
+      MapPublicIpOnLaunch: true
+      CidrBlock: !If
+        - UseCustomPub3
+        - !Ref PublicSubnet3Cidr
+        - !FindInMap [NetworkCidrs, !Ref Environment, PublicIngress3]
+
+  # --- Private App Subnets ---
+  PrivateApp1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ChaosVpc
+      MapPublicIpOnLaunch: false
+      CidrBlock: !If
+        - UseCustomPriv1
+        - !Ref PrivateSubnet1Cidr
+        - !FindInMap [NetworkCidrs, !Ref Environment, PrivateApp1]
+
+  PrivateApp2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ChaosVpc
+      MapPublicIpOnLaunch: false
+      CidrBlock: !If
+        - UseCustomPriv2
+        - !Ref PrivateSubnet2Cidr
+        - !FindInMap [NetworkCidrs, !Ref Environment, PrivateApp2]
+
+  PrivateApp3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ChaosVpc
+      MapPublicIpOnLaunch: false
+      CidrBlock: !If
+        - UseCustomPriv3
+        - !Ref PrivateSubnet3Cidr
+        - !FindInMap [NetworkCidrs, !Ref Environment, PrivateApp3]
+  
+  # --- Public Route Table Associations ---
+  PublicIngress1RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicIngress1
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicIngress2RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicIngress2
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicIngress3RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicIngress3
+      RouteTableId: !Ref PublicRouteTable
+
+  # --- Private Route Table Associations ---
+  PrivateApp1RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateApp1
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateApp2RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateApp2
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateApp3RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateApp3
+      RouteTableId: !Ref PrivateRouteTable
+
+  # --- Security Groups ---
+  ChaosICMP:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ICMP access
+      VpcId: !Ref ChaosVpc
+      SecurityGroupIngress:
+        - CidrIp: !Ref IcmpCidr
+          IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+
+  ChaosSSH:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SSH access
+      VpcId: !Ref ChaosVpc
+      SecurityGroupIngress:
+        - CidrIp: !Ref SshCidr
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+
+  ChaosHTTP:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: HTTP access
+      VpcId: !Ref ChaosVpc
+      SecurityGroupIngress:
+        - CidrIp: !Ref HttpCidr
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+
+  ChaosHTTPS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: HTTPS access
+      VpcId: !Ref ChaosVpc
+      SecurityGroupIngress:
+        - CidrIp: !Ref HttpsCidr
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+
+  ChaosRDP:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: RDP access
+      VpcId: !Ref ChaosVpc
+      SecurityGroupIngress:
+        - CidrIp: !Ref RdpCidr
+          IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+
+  ChaosNFS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: NFS access
+      VpcId: !Ref ChaosVpc
+      SecurityGroupIngress:
+        - CidrIp: !Ref NfsCidr
+          IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+
+  # --- IAM / SSM Integration ---
+  SSMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  SSMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref SSMRole
+
+  # --- Linux, Windows, and Ubuntu Launch Templates ---
+  LinuxLaunchTemplate:
+    Condition: DeployLinuxEnabled
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        InstanceType: !Ref LinuxInstanceType
+        ImageId: !FindInMap [RegionAMI, !Ref AWS::Region, LinuxAMI]
+        IamInstanceProfile:
+          Arn: !GetAtt SSMInstanceProfile.Arn
+        MetadataOptions:
+          HttpTokens: required
+        SecurityGroupIds:
+          - !If [LinuxICMPEnabled,  !Ref ChaosICMP, !Ref AWS::NoValue]
+          - !If [LinuxSSHEnabled,   !Ref ChaosSSH, !Ref AWS::NoValue]
+          - !If [LinuxHTTPEnabled,  !Ref ChaosHTTP, !Ref AWS::NoValue]
+          - !If [LinuxHTTPSEnabled, !Ref ChaosHTTPS, !Ref AWS::NoValue]
+          - !If [LinuxNFSEnabled,   !Ref ChaosNFS, !Ref AWS::NoValue]
+
+  WindowsLaunchTemplate:
+    Condition: DeployWindowsEnabled
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        InstanceType: !Ref WindowsInstanceType
+        ImageId: !FindInMap [RegionAMI, !Ref AWS::Region, WindowsAMI]
+        IamInstanceProfile:
+          Arn: !GetAtt SSMInstanceProfile.Arn
+        MetadataOptions:
+          HttpTokens: required
+        SecurityGroupIds:
+          - !If [WindowsICMPEnabled,  !Ref ChaosICMP, !Ref AWS::NoValue]
+          - !If [WindowsSSHEnabled,   !Ref ChaosSSH, !Ref AWS::NoValue]
+          - !If [WindowsHTTPEnabled,  !Ref ChaosHTTP, !Ref AWS::NoValue]
+          - !If [WindowsHTTPSEnabled, !Ref ChaosHTTPS, !Ref AWS::NoValue]
+          - !If [WindowsRDPEnabled,   !Ref ChaosRDP, !Ref AWS::NoValue]
+
+  UbuntuLaunchTemplate:
+    Condition: DeployUbuntuEnabled
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        InstanceType: !Ref UbuntuInstanceType
+        ImageId: !FindInMap [RegionAMI, !Ref AWS::Region, UbuntuAMI]
+        IamInstanceProfile:
+          Arn: !GetAtt SSMInstanceProfile.Arn
+        MetadataOptions:
+          HttpTokens: required
+        SecurityGroupIds:
+          - !If [UbuntuICMPEnabled,  !Ref ChaosICMP, !Ref AWS::NoValue]
+          - !If [UbuntuSSHEnabled,   !Ref ChaosSSH, !Ref AWS::NoValue]
+          - !If [UbuntuHTTPEnabled,  !Ref ChaosHTTP, !Ref AWS::NoValue]
+          - !If [UbuntuHTTPSEnabled, !Ref ChaosHTTPS, !Ref AWS::NoValue]
+          - !If [UbuntuNFSEnabled,   !Ref ChaosNFS, !Ref AWS::NoValue]
+
+  # --- Auto Scaling Groups ---
+  LinuxASG:
+    Condition: DeployLinuxEnabled
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - !Ref PublicIngress1
+        - !Ref PublicIngress2
+        - !Ref PublicIngress3
+      DesiredCapacity: !Ref LinuxInstanceCount
+      MinSize: 0
+      MaxSize: 10
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LinuxLaunchTemplate
+        Version: !GetAtt LinuxLaunchTemplate.LatestVersionNumber
+
+  WindowsASG:
+    Condition: DeployWindowsEnabled
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - !Ref PublicIngress1
+        - !Ref PublicIngress2
+        - !Ref PublicIngress3
+      DesiredCapacity: !Ref WindowsInstanceCount
+      MinSize: 0
+      MaxSize: 10
+      LaunchTemplate:
+        LaunchTemplateId: !Ref WindowsLaunchTemplate
+        Version: !GetAtt WindowsLaunchTemplate.LatestVersionNumber
+
+  UbuntuASG:
+    Condition: DeployUbuntuEnabled
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - !Ref PublicIngress1
+        - !Ref PublicIngress2
+        - !Ref PublicIngress3
+      DesiredCapacity: !Ref UbuntuInstanceCount
+      MinSize: 0
+      MaxSize: 10
+      LaunchTemplate:
+        LaunchTemplateId: !Ref UbuntuLaunchTemplate
+        Version: !GetAtt UbuntuLaunchTemplate.LatestVersionNumber
+
+  # --- Storage ---
+  
+
+Outputs:
+
+  # --- VPC and Subnets ---
+  VpcId:
+    Description: ID of the created VPC.
+    Value: !Ref ChaosVpc
+
+  PublicSubnet1:
+    Description: Public Subnet 1 ID.
+    Value: !Ref PublicIngress1
+
+  PublicSubnet2:
+    Description: Public Subnet 2 ID.
+    Value: !Ref PublicIngress2
+
+  PublicSubnet3:
+    Description: Public Subnet 3 ID.
+    Value: !Ref PublicIngress3
+
+  PrivateSubnet1:
+    Description: Private Subnet 1 ID.
+    Value: !Ref PrivateApp1
+
+  PrivateSubnet2:
+    Description: Private Subnet 2 ID.
+    Value: !Ref PrivateApp2
+
+  PrivateSubnet3:
+    Description: Private Subnet 3 ID.
+    Value: !Ref PrivateApp3
+
+  # --- Security Groups ---
+  IcmpSecurityGroup:
+    Description: ICMP security group ID.
+    Value: !Ref ChaosICMP
+
+  SshSecurityGroup:
+    Description: SSH security group ID.
+    Value: !Ref ChaosSSH
+
+  HttpSecurityGroup:
+    Description: HTTP security group ID.
+    Value: !Ref ChaosHTTP
+
+  HttpsSecurityGroup:
+    Description: HTTPS security group ID.
+    Value: !Ref ChaosHTTPS
+
+  RdpSecurityGroup:
+    Description: RDP security group ID.
+    Value: !Ref ChaosRDP
+
+  NfsSecurityGroup:
+    Description: NFS security group ID.
+    Value: !Ref ChaosNFS
+
+  # --- Auto Scaling Groups ---
+  LinuxASGName:
+    Condition: DeployLinuxEnabled
+    Description: Name of the Linux Auto Scaling Group.
+    Value: !Ref LinuxASG
+
+  WindowsASGName:
+    Condition: DeployWindowsEnabled
+    Description: Name of the Windows Auto Scaling Group.
+    Value: !Ref WindowsASG
+
+  UbuntuASGName:
+    Condition: DeployUbuntuEnabled
+    Description: Name of the Ubuntu Auto Scaling Group.
+    Value: !Ref UbuntuASG
+
+  # --- Launch Templates ---
+  LinuxLaunchTemplateId:
+    Condition: DeployLinuxEnabled
+    Description: Linux launch template ID.
+    Value: !Ref LinuxLaunchTemplate
+
+  WindowsLaunchTemplateId:
+    Condition: DeployWindowsEnabled
+    Description: Windows launch template ID.
+    Value: !Ref WindowsLaunchTemplate
+
+  UbuntuLaunchTemplateId:
+    Condition: DeployUbuntuEnabled
+    Description: Ubuntu launch template ID.
+    Value: !Ref UbuntuLaunchTemplate
+
+  # --- IAM / SSM Integration ---
+  SSMInstanceProfileArn:
+    Description: ARN of the SSM instance profile.
+    Value: !GetAtt SSMInstanceProfile.Arn
+
+  # --- Storage ---
