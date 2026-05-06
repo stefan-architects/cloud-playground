@@ -1,36 +1,35 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Creates a single S3 bucket and ec2 instance to test a one-click deployment via Cloudformation.
 
+Parameters:
+  ChaosBucket7779311:
+    Type: String
+    Default: ChaosBucket7779311
+
 Resources:
-  # Logical ID using for bucket
-  thebucketsbucket:
+  Chaos-Bucket777-9311:
     Type: 'AWS::S3::Bucket'
     Properties:
+     AccessControl: Private
+     BucketEncryption:
+       ServerSideEncryptionConfiguration:
+         - ServerSideEncryptionByDefault:
+             SSEAlgorithm: AES256
     # https://docs.aws.amazon.com/AmazonS3/latest/userguide/gpbucketnamespaces.html
-      # BucketName:       
-        ## can use pseudo parameter: BucketName: !Sub "amzn-s3-demo-bucket-${AWS::AccountId}-${AWS::Region}-an"
-        ### can't use bucket name and bucket prefix at same time
-      # Physcial ID for bucket
-      BucketNamePrefix: chaos
-      # added "account-regional"
-      BucketNamespace: "account-regional"
+      # Psudeoparameter ---> BucketName: !Sub "${BucketBaseName}-${AWS::AccountId}-${AWS::Region}-an"
+      ## can't use bucket name and bucket prefix at same time
+      ### ensure you use the same name
+      BucketNamePrefix: ChaosBucket7779311 # <--- create parameter !Ref BucketBaseName
+      BucketNamespace: "account-regional"   # added "account-regional"
+      VersioningConfiguration:
+       Status: Enabled
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: false
-        BlockPublicPolicy: false
-        IgnorePublicAcls: false
-        RestrictPublicBuckets: false
-
-  TheInstanceInstance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: t2.micro
-      ImageId: ami-0c02fb55956c7d316
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
 Outputs:
-  BucketName:
-    Description: Name of the S3 bucket created by this stack
-    Value: !Ref thebucketsbucket
-
-  InstanceName:
-    Description: Name of the instance created by this stack
-    Value: !Ref TheInstanceInstance
+ BucketName:
+   Description: Name of the created S3 bucket
+   Value: !Ref ChaosBucket7779311

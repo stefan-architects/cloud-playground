@@ -1,21 +1,29 @@
 
-## 🎯 Why I *re*Built It
-Much like the template before it, this one ran off on its own adventure. Instead of chasing it after it, I decided a clean rebuild was the sane option.
+## 🎯 Why I Built an s3 Bucket
+For whatever this bucket becomes, it’s already locked down, versioned, and ready for the day I decide it needs to store something important… or something I forgot about.
 
-## 📌 What I *re*Built
+*For details on how this project handles documentation updates, see `docs/evolving-docs.md`.*
+
+## 🏗️ Current Build
 | Category | What Gets Built | Notes |
 | --- | --- | --- |
-| **VPC** | 1× VPC (``ChaosVpc``) | CIDR comes from environment mapping or overrides. |
-| **Internet Access** | Internet Gateway + VPC attachment | Enables outbound internet for public subnets. |
-| **Route Tables** | 1× Public RT, 1× Private RT | Public RT has default route to IGW. |
-| **Subnets (Public)** | 3× Public subnets | ``PublicIngress1/2/3`` with optional CIDR overrides. |
-| **Subnets (Private)** | 3× Private subnets | ``PrivateApp1/2/3`` with optional CIDR overrides. |
-| **Route Table Associations** | 3× public + 3× private associations | Each subnet mapped to correct RT. |
-| **Security Groups** | ICMP, SSH, HTTP, HTTPS, RDP, NFS | All created regardless of OS toggles; attached conditionally. |
-| **IAM** | 1× SSM Role + 1× Instance Profile | Grants SSM Session Manager access. |
-| **Launch Templates** | Linux, Windows, Ubuntu (conditional) | Includes AMI mapping, instance type, SSM profile, SG toggles. |
-| **Auto Scaling Groups** | Linux, Windows, Ubuntu (conditional) | Each spans all 3 public subnets; size controlled by parameters. |
-| **Outputs** | VPC ID, Subnet IDs, SG IDs, ASG names, LT IDs, SSM profile ARN | Provides all major resource identifiers. |
+| **ChaosVpc** | VPC environment | Networking, security, IAM, launch templates, ASGs, and outputs |
+
+### 🧭 Evolving Documentation
+This CloudFormation template is evolving — and this README will evolve with it. Instead of maintaining multiple documents, this one will stay continuously updated… because version‑controlling my own thoughts is apparently the only way to keep things sane.
+
+## 🛠️ Added to Build
+As the infrastructure grows, new components will be documented here in the same format as the core stack above.
+| Category | What Gets Built | Notes |
+| --- | --- | --- |
+| **S3 Bucket** | 1× Private S3 Bucket | Core storage bucket for application or logging. |
+| **AccessControl** | ACL = Private | Ensures no public ACLs are allowed. |
+| **BucketEncryption** | AES256 SSE | Encrypts all objects at rest. |
+| **BucketNamespace** | ``account-regional`` | Ensures bucket names are unique per account + region. |
+| **BucketNamePrefix** | ``ChaosBucket7779311`` | Predictable prefix; CloudFormation appends unique suffix. |
+| **BucketName** | *Not used* | Mutually exclusive with prefix; prefix chosen for safer naming. |
+| **Versioning** | Enabled | Protects against accidental overwrites/deletes. |
+| **Public Access Block** | All public access blocked | Enforces best‑practice security posture. |
 
 ## ☁️ AWS Patterns Demonstrated
 - How an infrastructure is built using CloudFormation.
@@ -27,6 +35,8 @@ Much like the template before it, this one ran off on its own adventure. Instead
 - The template I used before was functional.
 - CloudFormation eliminates a lot of manual console work and reduces mistakes.
 - Able to interact with deployed resources through AWS CLI.
+- CloudFormation supports bringing existing or recently created resources under CloudFormation management.
+- AWS CLI and AWS Toolkit for VS Code each use their own authentication method.
 
 ## 🌀 What's Next  
 - Walk through the template to understand the resources it builds and the patterns it uses

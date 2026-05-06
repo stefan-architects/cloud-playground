@@ -223,11 +223,11 @@ Parameters:
     Default: "false"
     Description: Enables SSH security group for Linux instances.
   
-  # EnableLinuxICMP: 💡Commented out to test at a later date to see if this can be added when instance is launched
-    # Type: String
-    # AllowedValues: ["true","false"]
-    # Default: "false"
-    # Description: Enables ICMP security group for Linux instances.
+  EnableLinuxICMP: # ❌❌❌ Commented out to test at a later date to see if this can be added when instance is launched ❌❌❌
+    Type: String
+    AllowedValues: ["true","false"]
+    Default: "false"
+    Description: Enables ICMP security group for Linux instances.
 
   EnableLinuxHTTP:
     Type: String
@@ -690,7 +690,9 @@ Resources:
         Version: !GetAtt UbuntuLaunchTemplate.LatestVersionNumber
 
   # --- Storage ---
-  
+  # ✅✅✅ see ec2-and-s3-test.yaml on how to set this up ✅✅✅
+  ## start here. understand merging before starting again
+  ## make sure you are on the storage branch
 
 Outputs:
 

@@ -27,7 +27,8 @@ Resources:
         - Key: Name
           Value: ChaosMachineSG
 
-  ChaosInstance:
+  # ‼️merge this instance into chaos-vpc and update accordingly ‼️
+  UserDataInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
@@ -39,6 +40,7 @@ Resources:
         - Key: Name
           Value: ChaosMachine
       UserData:
+          # ‼️update user data to version 2 ‼️
         Fn::Base64: !Sub |
           #!/bin/bash
           yum update -y
@@ -65,8 +67,9 @@ Resources:
 Outputs:
   PublicIP:
     Description: Public IP of the Chaos Machine
-    Value: !GetAtt ChaosInstance.PublicIp
+    Value: !GetAtt UserDataInstance.PublicIp
 
   ChaosURL:
     Description: URL to view the chaotic webpage
-    Value: !Sub "http://${ChaosInstance.PublicDnsName}"
+    Value: !Sub "http://${UserDataInstance.PublicDnsName}"
+    # ‼️merge this instance into chaos-vpc and update accordingly ‼️
