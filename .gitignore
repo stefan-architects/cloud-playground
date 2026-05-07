@@ -1,14 +1,14 @@
-# Ignore a file
+# Ignore individual files
 TODO.md
 /git/NOTES.md
+aws-templates/cloudformation/chaos-vpc/chaos-vpc-test-template.yml
+aws-templates/cloudformation/chaos-vpc/Notes.md
 
-# ignore folder
+# Ignore folders
 aws-templates/cloudformation/aws-linux-lab/docs/
 admin/
 ai/
-aws-templates/cloudformation/chaos-vpc/chaos-vpc-test-template.yml
-aws-templates/cloudformation/chaos-vpc/Notes.md
-aws-templates/cloudformation/ec2-and-s3-test
-aws-templates/cloudformation/mayhem-instance
-aws-templates/cloudformation/user-data
-aws-templates/cloudformation/chaos-vpc-refresh
+aws-templates/cloudformation/ec2-and-s3-test/
+aws-templates/cloudformation/mayhem-instance/
+aws-templates/cloudformation/user-data/
+aws-templates/cloudformation/chaos-vpc-refresh/
