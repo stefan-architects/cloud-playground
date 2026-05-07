@@ -8,7 +8,7 @@ admin/
 ai/
 aws-templates/cloudformation/chaos-vpc/chaos-vpc-test-template.yml
 aws-templates/cloudformation/chaos-vpc/Notes.md
-aws-templates/cloudformation/ec2-and-s3-test/
-aws-templates/cloudformation/mayhem-instance/
-aws-templates/cloudformation/user-data/
+aws-templates/cloudformation/ec2-and-s3-test
+aws-templates/cloudformation/mayhem-instance
+aws-templates/cloudformation/user-data
 aws-templates/cloudformation/chaos-vpc-refresh
