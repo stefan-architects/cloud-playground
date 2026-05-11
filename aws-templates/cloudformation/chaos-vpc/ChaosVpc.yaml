@@ -223,7 +223,7 @@ Parameters:
     Default: "false"
     Description: Enables SSH security group for Linux instances.
   
-  EnableLinuxICMP: # ❌❌❌ Commented out to test at a later date to see if this can be added when instance is launched ❌❌❌
+  EnableLinuxICMP: #
     Type: String
     AllowedValues: ["true","false"]
     Default: "false"
@@ -690,9 +690,46 @@ Resources:
         Version: !GetAtt UbuntuLaunchTemplate.LatestVersionNumber
 
   # --- Storage ---
-  # ✅✅✅ see ec2-and-s3-test.yaml on how to set this up ✅✅✅
-  ## start here. understand merging before starting again
-  ## make sure you are on the storage branch
+
+  chaosbucket7779311:
+    Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Retain
+    Properties:
+      BucketNamePrefix: chaosbucket7779311
+      BucketNamespace: "account-regional"
+      AccessControl: Private
+      BucketEncryption:
+       ServerSideEncryptionConfiguration:
+         - ServerSideEncryptionByDefault:
+             SSEAlgorithm: AES256
+      VersioningConfiguration:
+       Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  ChaosBucketPolicy:
+  ## ❌❌❌ issue w/ deployment see fix notes ❌❌❌
+  ## ❌❌❌ The resource ChaosBucketPolicy is in a CREATE_FAILED state  ## ❌❌❌
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket:
+        Ref: 'chaosbucket7779311'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource:
+              Fn::Join:
+                - ''
+                - - 'arn:aws:s3:::'
+                  - Ref: 'chaosbucket7779311'
+                  - '/*'
+
 
 Outputs:
 
@@ -788,3 +825,6 @@ Outputs:
     Value: !GetAtt SSMInstanceProfile.Arn
 
   # --- Storage ---
+  BucketName:
+    Description: Name of the created bucket
+    Value: !Ref chaosbucket7779311
