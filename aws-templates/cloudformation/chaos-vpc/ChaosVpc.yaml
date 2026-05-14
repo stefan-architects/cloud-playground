@@ -692,8 +692,8 @@ Resources:
   # --- Storage ---
 
   chaosbucket7779311:
-    Type: 'AWS::S3::Bucket'
-    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
     Properties:
       BucketNamePrefix: chaosbucket7779311
       BucketNamespace: "account-regional"
@@ -711,23 +711,22 @@ Resources:
         RestrictPublicBuckets: true
 
   ChaosBucketPolicy:
-  ## ❌❌❌ issue w/ deployment see fix notes ❌❌❌
-  ## ❌❌❌ The resource ChaosBucketPolicy is in a CREATE_FAILED state  ## ❌❌❌
-    Type: 'AWS::S3::BucketPolicy'
+    Type: AWS::S3::BucketPolicy    
     Properties:
-      Bucket:
-        Ref: 'chaosbucket7779311'
+      Bucket: !Ref chaosbucket7779311
       PolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
+          - Action:
+              - s3:ListBucket
           - Effect: Allow
             Principal: '*'
-            Action: 's3:GetObject'
+            Action: s3:ListBucket 
             Resource:
               Fn::Join:
                 - ''
                 - - 'arn:aws:s3:::'
-                  - Ref: 'chaosbucket7779311'
+                  - !Ref chaosbucket7779311
                   - '/*'
 
 
