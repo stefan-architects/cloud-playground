@@ -710,25 +710,38 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
-  ChaosBucketPolicy:
-    Type: AWS::S3::BucketPolicy    
-    Properties:
-      Bucket: !Ref chaosbucket7779311
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - s3:ListBucket
-          - Effect: Allow
-            Principal: '*'
-            Action: s3:ListBucket 
-            Resource:
-              Fn::Join:
-                - ''
-                - - 'arn:aws:s3:::'
-                  - !Ref chaosbucket7779311
-                  - '/*'
+# -----------------------------------------------------------------------------
+# NOTE: This BucketPolicy was used temporarily during testing to observe how
+# public access behaves when PublicAccessBlockConfiguration is disabled.
+# After research and validation, the bucket was moved back to a fully private
+# configuration using PublicAccessBlockConfiguration alone.
+#
+# Because Block Public Access now prevents any public bucket policy from being
+# attached, this resource is intentionally commented out.
+#
+# Intentionally left in the template for reference in case public access testing is needed or needed in the future. 
+# If you want to test # public access, simply ...
+# uncomment this section
+# Set PublicAccessBlockConfiguration to true
+# redeploy the stack. Remember to clean up any public access configurations after testing to maintain security. 
+  
+# -----------------------------------------------------------------------------
 
+# ChaosBucketPolicy:
+#   Type: AWS::S3::BucketPolicy
+#   Properties:
+#     Bucket: !Ref chaosbucket7779311
+#     PolicyDocument:
+#       Version: 2012-10-17
+#       Statement:
+#         - Action:
+#             - s3:ListBucket
+#           Effect: Allow
+#           Resource: !Join
+#             - ''
+#             - - 'arn:aws:s3:::'
+#               - !Ref chaosbucket7779311
+#           Principal: '*'
 
 Outputs:
 
