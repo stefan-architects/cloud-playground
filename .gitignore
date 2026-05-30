@@ -5,3 +5,5 @@ aws-templates/cloudformation/chaos-vpc/Notes.md
 
 # Ignore folders
 ai/
+cloudops/monitoring/cloudops-template-lab.md
+.gitignore
