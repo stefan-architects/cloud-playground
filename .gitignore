@@ -7,3 +7,4 @@ aws-templates/cloudformation/chaos-vpc/Notes.md
 ai/
 cloudops/monitoring/cloudops-template-lab.md
 .gitignore
+cloudops/monitoring/cloudops-template-readme.md
