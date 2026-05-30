@@ -1,19 +1,32 @@
-## 📌 What's being built?
+# Project Status: On Hold (…for now 👀)
 
-CloudFormation and CLI templates for deploying and testing AWS resources — the practical, slightly chaotic toolkit you use when you want real infrastructure spinning up fast and you’re not afraid...*yet*.
+This project is currently **on hold**, floating in a mysterious limbo between “paused” and “I’ll get back to it eventually.”
 
-## 🎯 Purpose
+## 📌 Why?
+Because life decided to throw a few plot twists, and I’m currently channeling my energy into leveling up my cloud superpowers.
 
-Before everything spirals into even more cloud‑powered experimentation, here’s the real purpose behind it all:
+Also, chaos. Always chaos.
 
-- What the AWS CLI is and how to run basic commands… even when things don’t behave exactly the way the docs say they should
-- What CloudFormation is and how templates attempt to create resources in a predictable way—until a dependency or parameter decides otherwise
-- How the CLI and CloudFormation work together, and occasionally step on each other’s toes when you forget a flag or misname a stack
-- When to use each tool in real-world scenarios, especially when speed, automation, or damage control is involved
-- Methodologies for architecting on AWS while embracing the fact that cloud environments are never as static or orderly as diagrams suggest  
+## 🎯 Current Focus: AWS CloudOps Engineering Associate  
+I’m deep in preparation mode for the **AWS CloudOps Engineering Associate** certification — learning all the fun things like:
 
-## 🚧 Project Status
+- Infrastructure that refuses to break  
+- Monitoring dashboards that stare into your soul  
+- Automation spells (a.k.a. IaC)  
+- Incident response rituals  
+- Cost optimization sorcery  
 
-And because nothing teaches faster than chaos...
+Once I emerge victorious, this project may return stronger, faster, and significantly more cloud‑optimized.
 
-We are having a planned and unplanned (***more like self-imposed***) break. While this pause wasn’t anticipated (***it was***), it was taken deliberately (***not really***)—but it’s a good moment to look at what’s done, clean up, set up what’s next, and let a bit of quiet progress keep things moving.
+## ⏸️ Project State
+- Code is stable…*probably*
+- No active development  
+- Issues and PRs may be answered on a timeline best described as “cosmic”
+
+## 🔄 Future Plans
+The project will resume when the stars align, the certification is conquered, and the chaos subsides (or increases — who knows).
+
+If you want to contribute, poke around, or revive something, feel free to open an issue. I dare you.
+
+## 🙏 Thanks
+Thanks for your patience, curiosity, and willingness to witness this beautiful mess.
